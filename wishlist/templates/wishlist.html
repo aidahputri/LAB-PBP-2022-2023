@@ -4,6 +4,9 @@
 <h5>Nama: </h5>
 <p>{{nama}}</p>
 
+<h5>NPM: </h5>
+<p>{{npm}}</p>
+
 <table>
     <tr>
     <th>Nama Barang</th>
@@ -18,5 +21,9 @@
     </tr>
     {% endfor %}
 </table>
+
+<h5>Sesi terakhir login: {{ last_login }}</h5>
+
+<button><a href="{% url 'wishlist:logout' %}">Logout</a></button>
 
 {% endblock content %}
