@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block meta %}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+    {% comment %} referensi Bonaventura Galang 210663005 {% endcomment %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        function fillTable() {
+            for(var a = it$(".table > tbody").children().length; a >= 2; a--){
+                $(".table > tbody > tr:nth-child(" + a + ")").remove();
+            } 
+            
+            $.get("http://localhost:8000/wishlist/json/", function(data) {
+                // isi tabel
+                for(var b = 0; b < data.length; b++){
+                var tableRow = document.createElement("tr");
+                var tableDataName = document.createElement("td");
+                tableDataName.append(data[b].fields.name);
+                var tableDataPrice = document.createElement("td");
+                tableDataPrice.append(data[b].fields.price);
+                var tableDataDescription = document.createElement("td");
+                tableDataDescription.append(data[b].fields.description);
+                
+                tableRow.append(tableDataName);
+                tableRow.append(tableDataPrice);
+                tableRow.append(tableDataDescription);
+                $(".table").append(tableRow);
+                }
+            });
+        }
+
+        {% comment %} referensi https://learn.jquery.com/using-jquery-core/document-ready/ {% endcomment %}
+        {% comment %} referensi Bonaventura Galang 2106630025 {% endcomment %}
+        $( document ).ready(function() {
+            //call fillTable function
+            fillTable();
+            
+            $("#add_item").click(function(){
+                var item_name = $("#name").val();
+                var item_price = $("#price").val();
+                var item_description = $("#description").val();
+        
+                
+                $.post("http://localhost:8000/wishlist/ajax/submit/",
+                {item_name, item_price, item_description},
+                function(data, status){
+                console.log("add item success!");
+                fillTable();
+                $("#name").val("");
+                $("#price").val("");
+                $("#description").val("");
+                });
+            });
+        });
+    </script>
+    <title>Wishlist</title>
+</head>
+{% endblock meta %}
+
+{% block content %}
+<body>
+    <nav class="navbar z-50 p-3" style="background-color: #e3f2fd;">
+        <div class="d-flex container-fluid">
+          <span class="navbar-brand fw-bold text-primary mb-0 h1">Wishlist {{nama}} :D</span>
+          <button type="button" class="btn btn-light"><a class="text-primary hover-text-white" href="{% url 'wishlist:logout' %}">Logout</a></button>
+        </div>
+    </nav>
+
+    <div class="p-4 mb-2">
+        <table class="table table-bordered" id="wishlist_table">
+            <tr>
+                <th>Nama Barang</th>
+                <th>Harga Barang</th>
+                <th>Deskripsi</th>
+            </tr>
+        </table>
+    </div>
+    
+    {% comment %} form untuk add item {% endcomment %}
+    <h6>Add Item</h6>
+    <form method="POST" action="">
+        {% csrf_token %}
+        <table>
+            <tr>
+                <td>Nama Barang </td>
+                <td><input type="text" name="name" class="form-control" id="name"></td>
+            </tr>
+                    
+            <tr>
+                <td>Harga Barang</td>
+                <td><input type="text" name="price" class="form-control" id="price"></td>
+            </tr>
+            
+            <tr>
+                <td>Deskripsi</td>
+                <td><input class="form-control" type="text" name="description" id="description"></td>
+            </tr>
+        </table>
+    </form>
+    <td><input class="btn btn-blue" type="submit" value="Submit" id="add_item"></td>
+    
+    <h5>Sesi terakhir login: {{ last_login }}</h5>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
+</body>
+
+{% endblock content %}

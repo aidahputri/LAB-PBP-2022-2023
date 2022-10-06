@@ -8,6 +8,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 import datetime
 from django.http import HttpResponseRedirect
@@ -24,6 +25,28 @@ def show_wishlist(request):
     'last_login': request.COOKIES['last_login'],
     }
     return render(request, "wishlist.html", context)
+
+@login_required(login_url='/wishlist/login/')
+def show_wishlist_ajax(request):
+    context = {
+    'nama': 'Aidah',
+    'npm': '2106653400',
+    'last_login': request.COOKIES['last_login'],
+    }
+    return render(request, "wishlist_ajax.html", context)
+
+@login_required(login_url='/wishlist/login/')
+@csrf_exempt # referensi https://www.w3schools.blog/csrf_exempt
+def add_item(request):
+    if request.method == "POST":
+        item_name = request.POST.get("item_name")
+        item_price = request.POST.get("item_price")
+        item_description = request.POST.get("item_description")
+        BarangWishlist.objects.create(nama_barang=item_name, harga_barang=item_price, deskripsi=item_description)
+        return HttpResponse()
+    else:
+        print("disini")
+        return redirect("wishlist:show_wishlist")
 
 def show_xml(request):
     data = BarangWishlist.objects.all()
